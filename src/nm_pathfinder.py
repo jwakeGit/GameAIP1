@@ -31,6 +31,7 @@ def find_path (source_point, destination_point, mesh):
         return path, boxes.values()
 
     def breadth_first_search (start, goal, graph, adj):
+        print(f'source point: {source_point}')
         #print('debug 1')
         queue = [start]
         prevs = {start: None}
@@ -41,6 +42,8 @@ def find_path (source_point, destination_point, mesh):
             current_node = queue.pop(0)
             if current_node == goal:
                 linePath.append(destination_point)
+                detail_points[goal] = destination_point
+                print(f'destination point: {destination_point}')
                 #print('debug 4')
                 print('Path!')
                 #returnPath = []
@@ -65,7 +68,9 @@ def find_path (source_point, destination_point, mesh):
                     detail_points[current_node] = (dx, dy)
                     linePath.insert(0, detail_points[current_node])
                     print(f'debug: inserted {detail_points[current_node]}')
+                    print(linePath)
                 #returnPath.append(start)
+                linePath.insert(0, source_point)
                 return linePath
                 #return returnPath
             else:
