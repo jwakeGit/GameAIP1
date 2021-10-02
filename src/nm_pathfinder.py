@@ -17,10 +17,10 @@ def find_path (source_point, destination_point, mesh):
     boxes = {}
 
     for box in mesh["boxes"]:
-        if box[0] <= source_point[0] and box[1] >= source_point[0] and box[2] <= source_point[1] and box[3] >= source_point[1]:
+        if contains_point(box, source_point):
             boxes['start'] = box
             #print(f'debug: start - {box}')
-        if box[0] <= destination_point[0] and box[1] >= destination_point[0] and box[2] <= destination_point[1] and box[3] >= destination_point[1]:
+        if contains_point(box, destination_point):
             boxes['goal'] = box
             #print(f'debug: goal - {box}')
     def breadth_first_search (start, goal, graph, adj):
@@ -82,3 +82,7 @@ def find_path (source_point, destination_point, mesh):
     #print(boxes.values())
     #this used to return boxes.keys() so keep that in mind
     return path, boxes.values()
+
+def contains_point(box, point):
+    # bx1 <= p.x && p.x <= bx2 && by1 <= p.y && p.y <= bx1
+    return box[0] <= point[0] <= box[1] and box[2] <= point[1] <= box[3]
