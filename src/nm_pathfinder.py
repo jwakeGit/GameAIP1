@@ -1,3 +1,5 @@
+import math
+
 def find_path (source_point, destination_point, mesh):
     """
     Searches for a path from source_point to destination_point through the mesh
@@ -17,12 +19,17 @@ def find_path (source_point, destination_point, mesh):
     boxes = {}
 
     for box in mesh["boxes"]:
-        if box[0] <= source_point[0] and box[1] >= source_point[0] and box[2] <= source_point[1] and box[3] >= source_point[1]:
+        if contains_point(box, source_point):
             boxes['start'] = box
             #print(f'debug: start - {box}')
-        if box[0] <= destination_point[0] and box[1] >= destination_point[0] and box[2] <= destination_point[1] and box[3] >= destination_point[1]:
+        if contains_point(box, destination_point):
             boxes['goal'] = box
             #print(f'debug: goal - {box}')
+
+    if boxes['start'] is None or boxes['goal'] is None:
+        print('No path!')
+        return path, boxes.values()
+
     def breadth_first_search (start, goal, graph, adj):
         #print('debug 1')
         queue = [start]
@@ -42,19 +49,19 @@ def find_path (source_point, destination_point, mesh):
                 #    returnPath.append((current_node[0], current_node[1], current_node[2], current_node[3]))
                     clone_node = current_node
                     current_node = prevs[current_node]
-                    curPoint = detail_points[clone_node]
-                    px = curPoint[0]
-                    py = curPoint[1]
-                    b1x1 = clone_node[2]
-                    b1x2 = clone_node[3]
-                    b1y1 = clone_node[0]
-                    b1y2 = clone_node[1]
-                    if b1x1 < current_node[2]: b1x1 = current_node[2]
-                    if b1x2 > current_node[3]: b1x2 = current_node[3]
-                    if b1y1 < current_node[0]: b1y1 = current_node[0]
-                    if b1y2 > current_node[1]: b1y2 = current_node[1]
-                    dx = max(b1x1 - px, 0, px - b1x2)
-                    dy = max(b1y1 - py, 0, py - b1y2)
+                    current_point = detail_points[clone_node]
+                    px = current_point[0]
+                    py = current_point[1]
+                    b1x1 = clone_node[0]
+                    b1x2 = clone_node[1]
+                    b1y1 = clone_node[2]
+                    b1y2 = clone_node[3]
+                    if b1x1 <= current_node[0]: dx = current_node[0]
+                    if b1x2 >= current_node[1]: dx = current_node[1]
+                    if b1y1 <= current_node[2]: dy = current_node[2]
+                    if b1y2 >= current_node[3]: dy = current_node[3]
+                    #dx = max(b1x1 - px, 0, px - b1x2)
+                    #dy = max(b1y1 - py, 0, py - b1y2)
                     detail_points[current_node] = (dx, dy)
                     linePath.insert(0, detail_points[current_node])
                     print(f'debug: inserted {detail_points[current_node]}')
@@ -79,3 +86,11 @@ def find_path (source_point, destination_point, mesh):
     #print(boxes.values())
     #this used to return boxes.keys() so keep that in mind
     return path, boxes.values()
+
+def contains_point(box, point):
+    # bx1 <= p.x && p.x <= bx2 && by1 <= p.y && p.y <= bx1
+    return box[0] <= point[0] <= box[1] and box[2] <= point[1] <= box[3]
+
+def euclidean_distance(point1, point2):
+    # distance = √((px2 - px1)^2 + (py2 - py1)^2)
+    return math.sqrt((point2[0]-point1[0])**2 + (point2[1]-point1[1])**2)
