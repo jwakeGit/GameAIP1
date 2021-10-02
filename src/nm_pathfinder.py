@@ -68,9 +68,6 @@ def find_path (source_point, destination_point, mesh):
                         prevs[new] = current_node
                         queue.append(new)
                         #detail point code has been moved away
-                        #these lines are excessive
-                        #linePath.append((dx, dy))
-                        #print(f'new point: {dx}, {dy}')
 
         print('No path!')
         return linePath
