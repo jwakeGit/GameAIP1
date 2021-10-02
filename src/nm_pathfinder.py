@@ -1,3 +1,5 @@
+import math
+
 def find_path (source_point, destination_point, mesh):
     """
     Searches for a path from source_point to destination_point through the mesh
@@ -23,6 +25,11 @@ def find_path (source_point, destination_point, mesh):
         if contains_point(box, destination_point):
             boxes['goal'] = box
             #print(f'debug: goal - {box}')
+
+    if boxes['start'] is None or boxes['goal'] is None:
+        print('No path!')
+        return path, boxes.values()
+
     def breadth_first_search (start, goal, graph, adj):
         #print('debug 1')
         queue = [start]
@@ -42,9 +49,9 @@ def find_path (source_point, destination_point, mesh):
                 #    returnPath.append((current_node[0], current_node[1], current_node[2], current_node[3]))
                     clone_node = current_node
                     current_node = prevs[current_node]
-                    curPoint = detail_points[clone_node]
-                    px = curPoint[0]
-                    py = curPoint[1]
+                    current_point = detail_points[clone_node]
+                    px = current_point[0]
+                    py = current_point[1]
                     b1x1 = clone_node[2]
                     b1x2 = clone_node[3]
                     b1y1 = clone_node[0]
@@ -86,3 +93,7 @@ def find_path (source_point, destination_point, mesh):
 def contains_point(box, point):
     # bx1 <= p.x && p.x <= bx2 && by1 <= p.y && p.y <= bx1
     return box[0] <= point[0] <= box[1] and box[2] <= point[1] <= box[3]
+
+def euclidean_distance(point1, point2):
+    # distance = √((px2 - px1)^2 + (py2 - py1)^2)
+    return math.sqrt((point2[0]-point1[0])**2 + (point2[1]-point1[1])**2)
