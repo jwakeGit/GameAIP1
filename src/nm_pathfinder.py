@@ -48,21 +48,16 @@ def find_path (source_point, destination_point, mesh):
                 while current_node != start:
                     boxes[current_node] = current_node
                 #    returnPath.append((current_node[0], current_node[1], current_node[2], current_node[3]))
-                    clone_node = current_node
+
+                    dx = detail_points[current_node][0]
+                    dy = detail_points[current_node][1]
                     current_node = prevs[current_node]
-                    current_point = detail_points[clone_node]
-                    px = current_point[0]
-                    py = current_point[1]
-                    b1x1 = clone_node[0]
-                    b1x2 = clone_node[1]
-                    b1y1 = clone_node[2]
-                    b1y2 = clone_node[3]
-                    if b1x1 <= current_node[0]: dx = current_node[0]
-                    if b1x2 >= current_node[1]: dx = current_node[1]
-                    if b1y1 <= current_node[2]: dy = current_node[2]
-                    if b1y2 >= current_node[3]: dy = current_node[3]
-                    #dx = max(b1x1 - px, 0, px - b1x2)
-                    #dy = max(b1y1 - py, 0, py - b1y2)
+
+                    if dx <= current_node[0]: dx = current_node[0]
+                    if dx >= current_node[1]: dx = current_node[1]
+                    if dy <= current_node[2]: dy = current_node[2]
+                    if dy >= current_node[3]: dy = current_node[3]
+
                     detail_points[current_node] = (dx, dy)
                     linePath.insert(0, detail_points[current_node])
                     print(f'debug: inserted {detail_points[current_node]}')
