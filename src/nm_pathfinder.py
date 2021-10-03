@@ -1,4 +1,5 @@
 import math
+from math import inf, sqrt
 
 def find_path (source_point, destination_point, mesh):
     """
@@ -30,6 +31,73 @@ def find_path (source_point, destination_point, mesh):
         print('No path!')
         return path, boxes.values()
 
+    def dijkstras_forward_search (start, goal, graph, adj):
+        paths = {start: []}
+        pathcosts = {start: 0}
+        queue = []
+        queue.append((0, start))
+        detail_points = {start: source_point, goal: destination_point}
+        whole_points = {start: source_point, goal: destination_point}
+        linePath = []
+
+        while queue:
+            #print(f'debug: here is queue(0): {queue[0]}')
+            priority, cell = queue.pop(0)
+            #print(f'debug: here is cell: {cell}')
+            boxes[cell] = cell
+            if cell == goal:
+                linePath.append(destination_point)
+                while cell != start:
+                #    returnPath.append((current_node[0], current_node[1], current_node[2], current_node[3]))
+
+                    dx = detail_points[cell][0]
+                    dy = detail_points[cell][1]
+                    cell = paths[cell]
+
+                    if dx <= cell[0]: dx = cell[0]
+                    if dx >= cell[1]: dx = cell[1]
+                    if dy <= cell[2]: dy = cell[2]
+                    if dy >= cell[3]: dy = cell[3]
+
+                    detail_points[cell] = (dx, dy)
+                    linePath.insert(0, detail_points[cell])
+                    #print(f'debug: inserted {detail_points[cell]}')
+                    #print(linePath)
+                linePath.insert(0, source_point)
+                return linePath
+            # investigate children
+            #print(f'debug: here is adj for {cell}: {adj[cell]}')
+            for child in adj[cell]:
+                dx = whole_points[cell][0]
+                dy = whole_points[cell][1]
+
+                if dx <= child[0]: dx = child[0]
+                if dx >= child[1]: dx = child[1]
+                if dy <= child[2]: dy = child[2]
+                if dy >= child[3]: dy = child[3]
+
+                whole_points[child] = (dx, dy)
+                # calculate cost along this path to child
+                cost_to_child = priority + transition_cost(whole_points, cell, child)
+                if child not in pathcosts or cost_to_child < pathcosts[child]:
+                    pathcosts[child] = cost_to_child            # update the cost
+                    paths[child] = cell                         # set the backpointer
+                    queue.append((cost_to_child, child))     # put the child on the priority queue
+
+        return False
+
+    def transition_cost(points, cell, cell2):
+        x1 = points[cell][0]
+        y1 = points[cell][1]
+        x2 = points[cell2][0]
+        y2 = points[cell2][1]
+        distance = sqrt((x1 - x2)**2 + (y1 - y2)**2)
+        estimated_distance = sqrt((x1 - destination_point[0])**2 + (y1 - destination_point[1])**2)
+        #average_cost = (level['spaces'][cell] + level['spaces'][cell2])/2
+        print(f'debug: distance: {distance}')
+        print(f'debug: estimated_distance: {estimated_distance}')
+        return distance + estimated_distance
+
     def breadth_first_search (start, goal, graph, adj):
         queue = [start]
         prevs = {start: None}
@@ -37,12 +105,12 @@ def find_path (source_point, destination_point, mesh):
         linePath = []
         while queue:
             current_node = queue.pop(0)
+            boxes[current_node] = current_node
             if current_node == goal:
                 linePath.append(destination_point)
                 detail_points[goal] = destination_point
                 print('Path!')
                 while current_node != start:
-                    boxes[current_node] = current_node
                 #    returnPath.append((current_node[0], current_node[1], current_node[2], current_node[3]))
 
                     dx = detail_points[current_node][0]
@@ -69,8 +137,9 @@ def find_path (source_point, destination_point, mesh):
         print('No path!')
         return linePath
 
-    path = breadth_first_search(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
-        
+    path = dijkstras_forward_search(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
+    #path = breadth_first_search(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
+
     return path, boxes.values()
 
 def contains_point(box, point):
