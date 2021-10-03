@@ -31,20 +31,16 @@ def find_path (source_point, destination_point, mesh):
         return path, boxes.values()
 
     def breadth_first_search (start, goal, graph, adj):
-        #print('debug 1')
         queue = [start]
         prevs = {start: None}
         detail_points = {start: source_point, goal: destination_point}
         linePath = []
         while queue:
-            #print('debug 2')
             current_node = queue.pop(0)
             if current_node == goal:
                 linePath.append(destination_point)
                 detail_points[goal] = destination_point
-                #print('debug 4')
                 print('Path!')
-                #returnPath = []
                 while current_node != start:
                     boxes[current_node] = current_node
                 #    returnPath.append((current_node[0], current_node[1], current_node[2], current_node[3]))
@@ -62,27 +58,19 @@ def find_path (source_point, destination_point, mesh):
                     linePath.insert(0, detail_points[current_node])
                     print(f'debug: inserted {detail_points[current_node]}')
                     print(linePath)
-                #returnPath.append(start)
                 linePath.insert(0, source_point)
                 return linePath
-                #return returnPath
             else:
-                #print('debug 3')
                 for new in adj[current_node]:
                     if new not in prevs:
                         prevs[new] = current_node
                         queue.append(new)
-                        #detail point code has been moved away
 
         print('No path!')
         return linePath
-        #returnPath = []
-        #return returnPath
 
     path = breadth_first_search(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
         
-    #print(boxes.values())
-    #this used to return boxes.keys() so keep that in mind
     return path, boxes.values()
 
 def contains_point(box, point):
