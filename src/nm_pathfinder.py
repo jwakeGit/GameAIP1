@@ -1,5 +1,5 @@
-import math
 from math import inf, sqrt
+from heapq import heappop, heappush
 
 def find_path (source_point, destination_point, mesh):
     """
@@ -27,26 +27,26 @@ def find_path (source_point, destination_point, mesh):
             boxes['goal'] = box
             #print(f'debug: goal - {box}')
 
-    if boxes['start'] is None or boxes['goal'] is None:
+    if 'start' not in boxes or 'goal' not in boxes:
         print('No path!')
-        return path, boxes.values()
+        return path, {}
 
     def dijkstras_forward_search (start, goal, graph, adj):
         paths = {start: []}
         pathcosts = {start: 0}
         queue = []
-        queue.append((0, start))
+        heappush(queue, (0, start))  # maintain a priority queue of cells
         detail_points = {start: source_point, goal: destination_point}
         whole_points = {start: source_point, goal: destination_point}
-        linePath = []
+        line_path = []
 
         while queue:
             #print(f'debug: here is queue(0): {queue[0]}')
-            priority, cell = queue.pop(0)
+            priority, cell = heappop(queue)
             #print(f'debug: here is cell: {cell}')
             boxes[cell] = cell
             if cell == goal:
-                linePath.append(destination_point)
+                line_path.append(destination_point)
                 while cell != start:
                 #    returnPath.append((current_node[0], current_node[1], current_node[2], current_node[3]))
 
@@ -60,11 +60,11 @@ def find_path (source_point, destination_point, mesh):
                     if dy >= cell[3]: dy = cell[3]
 
                     detail_points[cell] = (dx, dy)
-                    linePath.insert(0, detail_points[cell])
+                    line_path.insert(0, detail_points[cell])
                     #print(f'debug: inserted {detail_points[cell]}')
-                    #print(linePath)
-                linePath.insert(0, source_point)
-                return linePath
+                    #print(line_path)
+                line_path.insert(0, source_point)
+                return line_path
             # investigate children
             #print(f'debug: here is adj for {cell}: {adj[cell]}')
             for child in adj[cell]:
@@ -82,32 +82,27 @@ def find_path (source_point, destination_point, mesh):
                 if child not in pathcosts or cost_to_child < pathcosts[child]:
                     pathcosts[child] = cost_to_child            # update the cost
                     paths[child] = cell                         # set the backpointer
-                    queue.append((cost_to_child, child))     # put the child on the priority queue
+                    heappush(queue, (cost_to_child, child))     # put the child on the priority queue
 
         return False
 
     def transition_cost(points, cell, cell2):
-        x1 = points[cell][0]
-        y1 = points[cell][1]
-        x2 = points[cell2][0]
-        y2 = points[cell2][1]
-        distance = sqrt((x1 - x2)**2 + (y1 - y2)**2)
-        estimated_distance = sqrt((x1 - destination_point[0])**2 + (y1 - destination_point[1])**2)
-        #average_cost = (level['spaces'][cell] + level['spaces'][cell2])/2
-        print(f'debug: distance: {distance}')
-        print(f'debug: estimated_distance: {estimated_distance}')
+        distance = euclidean_distance(points[cell], points[cell2])
+        estimated_distance = euclidean_distance(points[cell], destination_point)
+        #print(f'debug: distance: {distance}')
+        #print(f'debug: estimated_distance: {estimated_distance}')
         return distance + estimated_distance
 
     def breadth_first_search (start, goal, graph, adj):
         queue = [start]
         prevs = {start: None}
         detail_points = {start: source_point, goal: destination_point}
-        linePath = []
+        line_path = []
         while queue:
             current_node = queue.pop(0)
             boxes[current_node] = current_node
             if current_node == goal:
-                linePath.append(destination_point)
+                line_path.append(destination_point)
                 detail_points[goal] = destination_point
                 print('Path!')
                 while current_node != start:
@@ -123,11 +118,11 @@ def find_path (source_point, destination_point, mesh):
                     if dy >= current_node[3]: dy = current_node[3]
 
                     detail_points[current_node] = (dx, dy)
-                    linePath.insert(0, detail_points[current_node])
+                    line_path.insert(0, detail_points[current_node])
                     print(f'debug: inserted {detail_points[current_node]}')
-                    print(linePath)
-                linePath.insert(0, source_point)
-                return linePath
+                    print(line_path)
+                line_path.insert(0, source_point)
+                return line_path
             else:
                 for new in adj[current_node]:
                     if new not in prevs:
@@ -135,7 +130,7 @@ def find_path (source_point, destination_point, mesh):
                         queue.append(new)
 
         print('No path!')
-        return linePath
+        return line_path
 
     path = dijkstras_forward_search(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
     #path = breadth_first_search(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
@@ -148,4 +143,4 @@ def contains_point(box, point):
 
 def euclidean_distance(point1, point2):
     # distance = √((px2 - px1)^2 + (py2 - py1)^2)
-    return math.sqrt((point2[0]-point1[0])**2 + (point2[1]-point1[1])**2)
+    return sqrt((point2[0]-point1[0])**2 + (point2[1]-point1[1])**2)
