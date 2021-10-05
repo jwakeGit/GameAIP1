@@ -32,8 +32,8 @@ def find_path (source_point, destination_point, mesh):
         return path, {}
 
     def bidirectional_astar(start, goal, graph, adj):
-        forward_prev_paths = {start: []}
-        backward_prev_paths = {goal: []}
+        forward_prev_paths = {start: None}
+        backward_prev_paths = {goal: None}
 
         forward_pathcosts = {start: 0}
         backward_pathcosts = {goal: 0}
@@ -50,29 +50,41 @@ def find_path (source_point, destination_point, mesh):
         while queue:
             priority, cell, curr_goal = heappop(queue)
             boxes[cell] = cell
-            if cell == goal:
+            if (cell in backward_prev_paths) and (cell in forward_prev_paths):
+                forward_curr = backward_curr = cell
+                path_forward = []
+                path_backward = [(forward_whole_points[cell], backward_whole_points[cell])]
+                while forward_prev_paths[forward_curr] is not None:
+                    path_forward.append((forward_whole_points[forward_prev_paths[forward_curr]], forward_whole_points[forward_curr]))
+                    forward_curr = forward_prev_paths[forward_curr]
+                path_forward.reverse()
+                while backward_prev_paths[backward_curr] is not None:
+                    path_backward.append((backward_whole_points[backward_prev_paths[backward_curr]], backward_whole_points[backward_curr]))
+                    backward_curr = backward_prev_paths[backward_curr]
+                    line_path = path_forward + path_backward
+                return line_path
             #if (curr_goal == 'destination' and cell in backward_prev_paths) \
             #        or (curr_goal == 'start' and cell in forward_prev_paths):
-                line_path.append(destination_point)
-                while cell != start:
-                    dx = detail_points[cell][0]
-                    dy = detail_points[cell][1]
-
-                    if curr_goal == 'destination':
-                        cell = forward_prev_paths[cell]
-                    else:
-                        cell = backward_prev_paths[cell]
-
-                    if dx <= cell[0]: dx = cell[0]
-                    if dx >= cell[1]: dx = cell[1]
-                    if dy <= cell[2]: dy = cell[2]
-                    if dy >= cell[3]: dy = cell[3]
-
-                    detail_points[cell] = (dx, dy)
-                    line_path.insert(0, detail_points[cell])
-                    #print(line_path)
-                line_path.insert(0, source_point)
-                return line_path
+            #     line_path.append(destination_point)
+            #     while cell != start:
+            #         dx = detail_points[cell][0]
+            #         dy = detail_points[cell][1]
+            #
+            #         if curr_goal == 'destination':
+            #             cell = forward_prev_paths[cell]
+            #         else:
+            #             cell = backward_prev_paths[cell]
+            #
+            #         if dx <= cell[0]: dx = cell[0]
+            #         if dx >= cell[1]: dx = cell[1]
+            #         if dy <= cell[2]: dy = cell[2]
+            #         if dy >= cell[3]: dy = cell[3]
+            #
+            #         detail_points[cell] = (dx, dy)
+            #         line_path.insert(0, detail_points[cell])
+            #         #print(line_path)
+            #     line_path.insert(0, source_point)
+            #     return line_path
             # investigate children
             for child in adj[cell]:
                 if curr_goal == 'destination':
