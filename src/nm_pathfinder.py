@@ -80,6 +80,7 @@ def find_path (source_point, destination_point, mesh):
                     paths[child] = cell  # set the backpointer
                     heappush(queue, (cost_to_child, child))  # put the child on the priority queue
 
+        print('No path found.')
         return []
 
     def bidirectional_astar(start, goal, graph, adj):
