@@ -113,6 +113,7 @@ def find_path (source_point, destination_point, mesh):
                     path_backward.append((backward_whole_points[backward_prev_paths[backward_curr]], backward_whole_points[backward_curr]))
                     backward_curr = backward_prev_paths[backward_curr]
                     line_path = path_forward + path_backward
+                print(f'debug: line_path = {line_path}')
                 return line_path
             # if (curr_goal == 'destination' and cell in backward_prev_paths) \
             #        or (curr_goal == 'start' and cell in forward_prev_paths):
@@ -166,8 +167,8 @@ def find_path (source_point, destination_point, mesh):
         print('No path!')
         return []
 
-    # path = bidirectional_astar(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
-    path = astar(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
+    path = bidirectional_astar(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
+    #path = astar(boxes['start'], boxes['goal'], mesh["boxes"], mesh["adj"])
 
     return path, boxes.values()
 

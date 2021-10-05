@@ -49,6 +49,7 @@ def redraw():
         canvas.create_rectangle(y1,x1,y2,x2,outline='pink')
 
     for i in range(len(path) - 1):
+        print(f'debug: path[i] = {path[i]}')
         x1, y1 = shrink(path[i])
         x2, y2 = shrink(path[i + 1])
         #print(f'x1: {x1}, x2: {x2}, y1: {y1}, y2: {y2}')
